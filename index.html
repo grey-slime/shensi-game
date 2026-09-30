@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>思辰医疗 · 记忆空间</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: #f0f2f5;
+      color: #2c3e50;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a3a5c 0%, #2a5a8c 100%);
+      color: white;
+      padding: 18px 40px;
+      font-size: 20px;
+      letter-spacing: 4px;
+      font-weight: 300;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .header .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header .logo::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #6ec6ff;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #6ec6ff;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .header .node-id {
+      font-size: 12px;
+      letter-spacing: 2px;
+      opacity: 0.6;
+      font-family: monospace;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 36px auto 120px;
+      padding: 0 20px;
+    }
+
+    .search-box {
+      display: flex;
+      margin: 0 0 24px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 14px 18px;
+      font-size: 16px;
+      border: 1px solid #d0d7de;
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      background: #fff;
+    }
+
+    .search-box input:focus { border-color: #2a5a8c; }
+
+    .search-box button {
+      padding: 14px 28px;
+      font-size: 16px;
+      background: #1a3a5c;
+      color: white;
+      border: none;
+      border-radius: 0 6px 6px 0;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 2px;
+      transition: background 0.2s;
+    }
+
+    .search-box button:hover { background: #2a5a8c; }
+    .search-box button:active { background: #0f2840; }
+
+    .content {
+      background: white;
+      padding: 36px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      line-height: 1.9;
+      font-size: 15.5px;
+      min-height: 320px;
+      transition: opacity 0.3s ease;
+    }
+
+    .content h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #1a3a5c;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      border-bottom: 2px solid #e8eef5;
+      padding-bottom: 14px;
+    }
+
+    .content p { margin: 12px 0; }
+
+    .content a {
+      color: #2a5a8c;
+      text-decoration: none;
+      border-bottom: 1px dashed #2a5a8c;
+      cursor: pointer;
+    }
+
+    .content a:hover {
+      color: #1a3a5c;
+      border-bottom-style: solid;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 80px 0;
+      color: #98a5b3;
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+
+    .loading .dots::after {
+      content: "";
+      animation: dots 1.4s infinite;
+    }
+
+    @keyframes dots {
+      0% { content: ""; }
+      25% { content: "."; }
+      50% { content: ".."; }
+      75% { content: "..."; }
+      100% { content: ""; }
+    }
+
+    .loading .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e0e6ed;
+      border-top-color: #2a5a8c;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-title {
+      color: #c0392b !important;
+      border-bottom-color: #f5d6d1 !important;
+    }
+
+    .error-code {
+      font-family: monospace;
+      font-size: 12px;
+      color: #ccc;
+      letter-spacing: 1px;
+      margin-top: 20px;
+    }
+
+    .memory-bar {
+      position: fixed;
+      bottom: 20px;
+      right: 24px;
+      background: rgba(26, 58, 92, 0.92);
+      color: #d0dbe6;
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      font-family: monospace;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
+      user-select: none;
+      z-index: 20;
+    }
+
+    .memory-bar span {
+      color: #6ec6ff;
+      font-weight: bold;
+    }
+
+    .panel {
+      position: fixed;
+      background: rgba(255, 255, 255, 0.97);
+      border: 1px solid #d0d7de;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+
+    .panel h4 {
+      margin: 0 0 10px 0;
+      font-size: 12px;
+      color: #1a3a5c;
+      letter-spacing: 1px;
+      font-weight: 500;
+      border-bottom: 1px solid #e8eef5;
+      padding-bottom: 8px;
+    }
+
+    .keyword-panel {
+      bottom: 20px;
+      left: 24px;
+      max-width: 240px;
+      max-height: 220px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .keyword-panel.visible { display: block; }
+
+    .keyword-panel .kw {
+      display: inline-block;
+      background: #eef3f8;
+      color: #2a5a8c;
+      padding: 3px 9px;
+      border-radius: 12px;
+      margin: 3px 4px 3px 0;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .keyword-panel .kw:hover { background: #d6e4f0; }
+
+    .memory-index {
+      top: 90px;
+      right: 24px;
+      width: 260px;
+      max-height: 60vh;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .memory-index.visible { display: block; }
+
+    .memory-index .item {
+      padding: 6px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #4a5a6a;
+      font-size: 11.5px;
+      transition: background 0.15s;
+      display: flex;
+      gap: 8px;
+    }
+
+    .memory-index .item:hover {
+      background: #eef3f8;
+      color: #1a3a5c;
+    }
+
+    .memory-index .item .id {
+      font-family: monospace;
+      color: #98a5b3;
+      flex-shrink: 0;
+    }
+
+    .memory-index .item.current {
+      background: #d6e4f0;
+      color: #1a3a5c;
+      font-weight: 500;
+    }
+
+    .index-toggle {
+      position: fixed;
+      top: 90px;
+      right: 24px;
+      background: #1a3a5c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+      z-index: 15;
+      transition: background 0.2s;
+    }
+
+    .index-toggle:hover { background: #2a5a8c; }
+
+    .hint-bar {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 12px;
+      color: #98a5b3;
+      letter-spacing: 1px;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px); }
+      40% { transform: translateX(4px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+    }
+
+    .shake { animation: shake 0.35s ease; }
+
+    @media (max-width: 700px) {
+      .header { padding: 14px 20px; font-size: 16px; letter-spacing: 2px; }
+      .container { margin: 20px auto 160px; padding: 0 12px; }
+      .content { padding: 24px 22px; font-size: 15px; }
+      .search-box button { padding: 14px 18px; letter-spacing: 0; }
+      .memory-bar { bottom: 12px; right: 12px; font-size: 11px; }
+      .keyword-panel { bottom: 60px; left: 12px; max-width: 180px; }
+      .memory-index { top: 76px; right: 12px; width: 220px; }
+      .index-toggle { top: 76px; right: 12px; width: 36px; height: 36px; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">思辰医疗 · 让每个灵魂完整</div>
+    <div class="node-id" id="nodeIdDisplay">MEM://N001</div>
+  </div>
+
+  <button class="index-toggle" id="indexToggle" onclick="toggleIndex()" title="记忆索引">☰</button>
+
+  <div class="container">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="搜索任何关键词..." autocomplete="off">
+      <button onclick="doSearch()">搜索</button>
+    </div>
+
+    <div class="content" id="content"></div>
+
+    <div class="hint-bar" id="hintBar">
+      提示：搜索框全局通用。输入任何你想到的关键词。
+    </div>
+  </div>
+
+  <div class="memory-bar">
+    记忆完整度：<span id="memoryPercent">0%</span>
+  </div>
+
+  <div class="panel keyword-panel" id="keywordPanel">
+    <h4>已发现关键词</h4>
+    <div id="keywordList"></div>
+  </div>
+
+  <div class="panel memory-index" id="memoryIndex">
+    <h4>记忆索引</h4>
+    <div id="memoryList"></div>
+  </div>
+
+  <script src="nodes.js"></script>
+
+  <script>
+    // ============================================================
+    // 全局状态
+    // ============================================================
+    let currentNodeId = "N001";
+    let unlockedNodes = JSON.parse(localStorage.getItem('unlockedNodes') || '["N001"]');
+    let discoveredKeywords = JSON.parse(localStorage.getItem('discoveredKeywords') || '[]');
+
+    // 真实节点数量（不含 N_LOCKED）
+    const realNodeIds = Object.keys(nodes).filter(function (id) {
+      return id !== "N_LOCKED";
+    });
+    const totalNodes = realNodeIds.length;
+
+    // ============================================================
+    // 节点渲染
+    // ============================================================
+    function renderNode(nodeId, skipLoading) {
+      const node = nodes[nodeId];
+      if (!node) return;
+
+      currentNodeId = nodeId;
+      unlockNode(nodeId);
+
+      document.getElementById('nodeIdDisplay').textContent = 'MEM://' + nodeId;
+
+      if (!skipLoading) {
+        document.getElementById('content').innerHTML = `
+          <div class="loading">
+            <div class="spinner"></div>
+            <div>正在从记忆空间读取数据<span class="dots"></span></div>
+          </div>
+        `;
+      }
+
+      const delay = skipLoading ? 0 : 500;
+
+      setTimeout(function () {
+        document.getElementById('content').innerHTML = node.content;
+        document.getElementById('content').classList.remove('shake');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        updateMemoryIndex();
+      }, delay);
+
+      updateMemory();
+      updateKeywordPanel();
+    }
+
+    // ============================================================
+    // 全局搜索逻辑
+    // ============================================================
+    function doSearch() {
+      const inputEl = document.getElementById('searchInput');
+      const input = inputEl.value.trim();
+
+      if (!input) {
+        showError('请输入搜索内容。');
+        return;
+      }
+
+      // 记录关键词
+      if (!discoveredKeywords.includes(input)) {
+        discoveredKeywords.push(input);
+        localStorage.setItem('discoveredKeywords', JSON.stringify(discoveredKeywords));
+      }
+
+      // ---- 1. 结局关键词：只在 N057 生效 ----
+      if (endingKeywords[input]) {
+        if (currentNodeId !== "N057") {
+          showError('这个词现在还没有意义。');
+          return;
+        }
+
+        const targetId = endingKeywords[input];
+
+        // 隐藏结局需要 N065 和 N056
+        if (targetId === "N069") {
+          const required = prerequisites["N069"] || ["N065", "N056"];
+          const allUnlocked = required.every(function (id) {
+            return unlockedNodes.includes(id);
+          });
+          if (!allUnlocked) {
+            inputEl.value = '';
+            renderNode("N_LOCKED");
+            return;
+          }
+        }
+
+        inputEl.value = '';
+        renderNode(targetId);
+        return;
+      }
+
+      // ---- 2. 全局关键词 ----
+      const targetId = globalKeywords[input];
+
+      if (!targetId) {
+        showError('记忆读取失败。请重试。');
+        return;
+      }
+
+      // ---- 3. 前置条件检查 ----
+      if (prerequisites[targetId] && !unlockedNodes.includes(targetId)) {
+        const required = prerequisites[targetId];
+        const allUnlocked = required.every(function (id) {
+          return unlockedNodes.includes(id);
+        });
+
+        if (!allUnlocked) {
+          inputEl.value = '';
+          renderNode("N_LOCKED");
+          return;
+        }
+      }
+
+      // ---- 4. 跳转 ----
+      inputEl.value = '';
+      renderNode(targetId);
+    }
+
+    // ============================================================
+    // 错误显示
+    // ============================================================
+    function showError(message) {
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <h2 class="error-title">记忆读取失败</h2>
+        <p>${message}</p>
+        <p style="font-size:12px;color:#999;">请尝试其他关键词。</p>
+        <p class="error-code">ERROR CODE: MEM_404</p>
+      `;
+      content.classList.add('shake');
+      setTimeout(function () {
+        content.classList.remove('shake');
+      }, 400);
+    }
+
+    // ============================================================
+    // 解锁节点
+    // ============================================================
+    function unlockNode(nodeId) {
+      if (!unlockedNodes.includes(nodeId)) {
+        unlockedNodes.push(nodeId);
+        localStorage.setItem('unlockedNodes', JSON.stringify(unlockedNodes));
+      }
+    }
+
+    // ============================================================
+    // 更新记忆完整度
+    // ============================================================
+    function updateMemory() {
+      const unlockedReal = unlockedNodes.filter(function (id) {
+        return id !== "N_LOCKED";
+      });
+      const percent = Math.round(unlockedReal.length / totalNodes * 100);
+      document.getElementById('memoryPercent').textContent = percent + '%';
+    }
+
+    // ============================================================
+    // 更新已发现关键词面板
+    // ============================================================
+    function updateKeywordPanel() {
+      const panel = document.getElementById('keywordPanel');
+      const list = document.getElementById('keywordList');
+
+      if (discoveredKeywords.length === 0) {
+        panel.classList.remove('visible');
+        return;
+      }
+
+      panel.classList.add('visible');
+      list.innerHTML = '';
+
+      discoveredKeywords.forEach(function (kw) {
+        const tag = document.createElement('span');
+        tag.className = 'kw';
+        tag.textContent = kw;
+        tag.onclick = function () {
+          document.getElementById('searchInput').value = kw;
+          document.getElementById('searchInput').focus();
+        };
+        list.appendChild(tag);
+      });
+    }
+
+    // ============================================================
+    // 更新记忆索引面板
+    // ============================================================
+    function updateMemoryIndex() {
+      const list = document.getElementById('memoryList');
+      if (!list) return;
+
+      list.innerHTML = '';
+
+      // 按节点编号排序
+      const sorted = unlockedNodes
+        .filter(function (id) { return id !== "N_LOCKED"; })
+        .sort(function (a, b) {
+          const na = parseInt(a.replace('N', ''), 10);
+          const nb = parseInt(b.replace('N', ''), 10);
+          return na - nb;
+        });
+
+      sorted.forEach(function (nodeId) {
+        const node = nodes[nodeId];
+        if (!node) return;
+
+        const item = document.createElement('div');
+        item.className = 'item' + (nodeId === currentNodeId ? ' current' : '');
+
+        const idSpan = document.createElement('span');
+        idSpan.className = 'id';
+        idSpan.textContent = nodeId;
+
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = node.title;
+
+        item.appendChild(idSpan);
+        item.appendChild(titleSpan);
+
+        item.onclick = function () {
+          renderNode(nodeId);
+          document.getElementById('memoryIndex').classList.remove('visible');
+          document.getElementById('indexToggle').style.display = 'block';
+        };
+
+        list.appendChild(item);
+      });
+
+      if (sorted.length === 0) {
+        list.innerHTML = '<div style="color:#98a5b3;font-size:11px;">暂无已解锁节点</div>';
+      }
+    }
+
+    // ============================================================
+    // 记忆索引开关
+    // ============================================================
+    function toggleIndex() {
+      const panel = document.getElementById('memoryIndex');
+      const toggle = document.getElementById('indexToggle');
+      const isVisible = panel.classList.contains('visible');
+
+      if (isVisible) {
+        panel.classList.remove('visible');
+        toggle.style.display = 'block';
+      } else {
+        updateMemoryIndex();
+        panel.classList.add('visible');
+        toggle.style.display = 'none';
+      }
+    }
+
+    // ============================================================
+    // 重置游戏
+    // ============================================================
+    function resetGame() {
+      if (!confirm('确定要重新开始吗？所有进度将被清除。')) return;
+      localStorage.removeItem('unlockedNodes');
+      localStorage.removeItem('discoveredKeywords');
+      location.reload();
+    }
+
+    // ============================================================
+    // 回车键支持
+    // ============================================================
+    document.getElementById('searchInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') doSearch();
+    });
+
+    // ============================================================
+    // 启动
+    // ============================================================
+    (function init() {
+      // 从最后解锁的非结局节点继续
+      const startNode = unlockedNodes.length > 0
+        ? unlockedNodes[unlockedNodes.length - 1]
+        : 'N001';
+
+      const nodeData = nodes[startNode];
+      const isEnding = startNode && startNode.startsWith('N06') && nodeData &&
+        (!nodeData.keywords || Object.keys(nodeData.keywords).length === 0);
+
+      if (!nodeData || isEnding || startNode === 'N_LOCKED') {
+        renderNode('N001', true);
+      } else {
+        renderNode(startNode, true);
+      }
+
+      updateMemory();
+      updateKeywordPanel();
+      updateMemoryIndex();
+    })();
+  </script>
+</body>
+</html>

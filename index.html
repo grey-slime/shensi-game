@@ -3,375 +3,246 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>思辰医疗 · 记忆空间</title>
+  <title>思辰医疗 · 官网首页</title>
   <style>
     * { box-sizing: border-box; }
-
     body {
       font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-      background: #f0f2f5;
-      color: #2c3e50;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
+      background: #ffffff; color: #2c3e50; margin: 0; padding: 0; min-height: 100vh;
+      transition: background 0.3s ease;
     }
+    body.page-bg-blue { background: #f2f7fa; }
+    body.node-fullscreen .game-area { max-width: 100%; padding: 0; margin: 0; }
+    body.node-fullscreen .content { padding: 0; border-radius: 0; box-shadow: none; background: transparent; }
+    body.node-fullscreen .hint-bar { display: none; }
 
     .header {
-      background: linear-gradient(135deg, #1a3a5c 0%, #2a5a8c 100%);
-      color: white;
-      padding: 18px 40px;
-      font-size: 20px;
-      letter-spacing: 4px;
-      font-weight: 300;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+      background: #ffffff;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 40px; border-bottom: 1px solid #e0e6ed;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      flex-wrap: wrap; gap: 15px;
     }
-
-    .header .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .header .logo { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+    .header .logo img.site-logo { height: 46px; width: auto; display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
+    .header .logo span { font-size: 20px; font-weight: bold; color: #1a3a5c; letter-spacing: 2px; white-space: nowrap; }
+    
+    .header .nav-links { display: flex; gap: 24px; font-size: 14px; flex-shrink: 0; }
+    .header .nav-links a { color: #1a3a5c; text-decoration: none; font-weight: 500; padding: 10px 0; transition: color 0.2s; white-space: nowrap; cursor: pointer; }
+    .header .nav-links a:hover { color: #007bff; }
+    
+    .header .right-actions { display: flex; align-items: center; gap: 20px; margin-left: auto; flex-shrink: 1; }
+    .top-search-box {
+      display: flex; align-items: center;
+      border: 2px solid #007bff; border-radius: 24px; overflow: hidden;
+      background: #f8f9fa; transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+      max-width: 320px; width: 100%;
     }
-
-    .header .logo::before {
-      content: "";
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      background: #6ec6ff;
-      border-radius: 50%;
-      box-shadow: 0 0 12px #6ec6ff;
-      animation: pulse 2s infinite;
+    .top-search-box:focus-within {
+      border-color: #0056b3; box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15); background: #fff;
     }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
+    .top-search-box input {
+      border: none; outline: none; padding: 10px 16px;
+      font-size: 14px; width: 100%; background: transparent;
+      font-family: inherit; color: #2c3e50;
     }
-
-    .header .node-id {
-      font-size: 12px;
-      letter-spacing: 2px;
-      opacity: 0.6;
-      font-family: monospace;
+    .top-search-box input::placeholder { color: #98a5b3; }
+    .top-search-box button {
+      border: none; background: #007bff; color: white;
+      padding: 10px 20px; font-size: 14px; font-weight: bold;
+      cursor: pointer; transition: background 0.2s; white-space: nowrap;
+      font-family: inherit; border-radius: 0 22px 22px 0;
     }
+    .top-search-box button:hover { background: #0056b3; }
 
-    .container {
-      max-width: 820px;
-      margin: 36px auto 120px;
-      padding: 0 20px;
-    }
-
-    .search-box {
-      display: flex;
-      margin: 0 0 24px 0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      border-radius: 6px;
+    .hero-section {
+      position: relative; width: 100vw; margin-left: calc(-50vw + 50%);
+      height: 650px;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0 60px; color: white;
       overflow: hidden;
     }
-
-    .search-box input {
-      flex: 1;
-      padding: 14px 18px;
-      font-size: 16px;
-      border: 1px solid #d0d7de;
-      border-right: none;
-      border-radius: 6px 0 0 6px;
-      outline: none;
-      font-family: inherit;
-      transition: border-color 0.2s;
-      background: #fff;
+    .hero-bg {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-size: cover; background-position: center;
+      transition: opacity 1.5s ease-in-out;
+      opacity: 0; z-index: 0;
+    }
+    .hero-bg.active { opacity: 1; z-index: 1; }
+    .hero-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.5));
+      z-index: 2;
+    }
+    .hero-content { position: relative; z-index: 3; max-width: 900px; }
+    .hero-title {
+      font-size: 48px; font-weight: 700; line-height: 1.3;
+      margin: 0 0 20px 0; letter-spacing: 2px; color: #ffffff;
+    }
+    .hero-subtitle {
+      font-size: 22px; font-weight: 400; line-height: 1.6;
+      margin: 0 0 30px 0; color: rgba(255, 255, 255, 0.9); letter-spacing: 1px;
+    }
+    .hero-stats {
+      font-size: 16px; font-weight: 400; margin: 0;
+      color: rgba(255, 255, 255, 0.75); letter-spacing: 1px;
+      border-left: 3px solid #2ecc71; padding-left: 14px;
     }
 
-    .search-box input:focus { border-color: #2a5a8c; }
-
-    .search-box button {
-      padding: 14px 28px;
-      font-size: 16px;
-      background: #1a3a5c;
-      color: white;
-      border: none;
-      border-radius: 0 6px 6px 0;
-      cursor: pointer;
-      font-family: inherit;
-      letter-spacing: 2px;
-      transition: background 0.2s;
-    }
-
-    .search-box button:hover { background: #2a5a8c; }
-    .search-box button:active { background: #0f2840; }
-
+    .game-area { max-width: 820px; margin: 0 auto; padding: 40px 20px 120px; }
     .content {
-      background: white;
-      padding: 36px 40px;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-      line-height: 1.9;
-      font-size: 15.5px;
-      min-height: 320px;
-      transition: opacity 0.3s ease;
+      background: #ffffff; padding: 30px 40px; border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      line-height: 1.9; font-size: 15.5px; min-height: 200px;
     }
-
-    .content h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      color: #1a3a5c;
-      font-size: 22px;
-      font-weight: 500;
-      letter-spacing: 1px;
-      border-bottom: 2px solid #e8eef5;
-      padding-bottom: 14px;
-    }
-
+    .content h2 { margin-top: 0; color: #1a3a5c; font-size: 24px; border-bottom: 2px solid #e8eef5; padding-bottom: 14px; }
     .content p { margin: 12px 0; }
 
-    .content a {
-      color: #2a5a8c;
-      text-decoration: none;
-      border-bottom: 1px dashed #2a5a8c;
+    .about-directory {
+      background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden;
+    }
+    .news-list-item {
+      display: flex; align-items: center;
+      padding: 24px 30px;
+      border-bottom: 1px solid #e0e6ed;
+      transition: all 0.3s;
       cursor: pointer;
     }
-
-    .content a:hover {
-      color: #1a3a5c;
-      border-bottom-style: solid;
+    .news-list-item:last-child { border-bottom: none; }
+    .news-date { font-family: monospace; font-size: 15px; color: #0056b3; width: 110px; flex-shrink: 0; transition: color 0.3s; }
+    .news-divider { color: #ccc; margin: 0 20px; font-size: 18px; transition: color 0.3s; }
+    .news-title { flex: 1; font-size: 17px; font-weight: bold; color: #1a3a5c; transition: color 0.3s; }
+    .news-btn {
+      border: 1px solid #0056b3; color: #0056b3; background: white;
+      padding: 8px 22px; border-radius: 4px; font-size: 14px;
+      cursor: pointer; font-family: inherit; transition: all 0.3s;
+      margin-left: 20px;
     }
+    .news-list-item.highlight { background: #1a3a5c; }
+    .news-list-item.highlight .news-date,
+    .news-list-item.highlight .news-title { color: white; }
+    .news-list-item.highlight .news-divider { color: rgba(255,255,255,0.4); }
+    .news-list-item.highlight .news-btn { background: transparent; color: white; border-color: white; }
+    .news-list-item:hover:not(.highlight) { background: #f8fafc; }
+    .news-list-item:hover .news-btn { background: #0056b3; color: white; }
+    .news-list-item.highlight:hover .news-btn { background: white; color: #1a3a5c; }
 
-    .loading {
-      text-align: center;
-      padding: 80px 0;
-      color: #98a5b3;
-      font-size: 14px;
-      letter-spacing: 2px;
-    }
-
-    .loading .dots::after {
-      content: "";
-      animation: dots 1.4s infinite;
-    }
-
-    @keyframes dots {
-      0% { content: ""; }
-      25% { content: "."; }
-      50% { content: ".."; }
-      75% { content: "..."; }
-      100% { content: ""; }
-    }
-
-    .loading .spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid #e0e6ed;
-      border-top-color: #2a5a8c;
-      border-radius: 50%;
-      margin: 0 auto 16px;
-      animation: spin 0.9s linear infinite;
-    }
-
+    .loading { text-align: center; padding: 60px 0; color: #98a5b3; font-size: 14px; letter-spacing: 2px; }
+    .loading .dots::after { content: ""; animation: dots 1.4s infinite; }
+    @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } 100% { content: ""; } }
+    .loading .spinner { width: 32px; height: 32px; border: 3px solid #e0e6ed; border-top-color: #007bff; border-radius: 50%; margin: 0 auto 16px; animation: spin 0.9s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .error-title {
-      color: #c0392b !important;
-      border-bottom-color: #f5d6d1 !important;
-    }
-
-    .error-code {
-      font-family: monospace;
-      font-size: 12px;
-      color: #ccc;
-      letter-spacing: 1px;
-      margin-top: 20px;
-    }
-
-    .memory-bar {
-      position: fixed;
-      bottom: 20px;
-      right: 24px;
-      background: rgba(26, 58, 92, 0.92);
-      color: #d0dbe6;
-      padding: 10px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      letter-spacing: 1px;
-      font-family: monospace;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(6px);
-      user-select: none;
-      z-index: 20;
-    }
-
-    .memory-bar span {
-      color: #6ec6ff;
-      font-weight: bold;
-    }
-
-    .panel {
-      position: fixed;
-      background: rgba(255, 255, 255, 0.97);
-      border: 1px solid #d0d7de;
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 12px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-      z-index: 10;
-      backdrop-filter: blur(8px);
-    }
-
-    .panel h4 {
-      margin: 0 0 10px 0;
-      font-size: 12px;
-      color: #1a3a5c;
-      letter-spacing: 1px;
-      font-weight: 500;
-      border-bottom: 1px solid #e8eef5;
-      padding-bottom: 8px;
-    }
-
-    .keyword-panel {
-      bottom: 20px;
-      left: 24px;
-      max-width: 240px;
-      max-height: 220px;
-      overflow-y: auto;
-      display: none;
-    }
-
-    .keyword-panel.visible { display: block; }
-
-    .keyword-panel .kw {
-      display: inline-block;
-      background: #eef3f8;
-      color: #2a5a8c;
-      padding: 3px 9px;
-      border-radius: 12px;
-      margin: 3px 4px 3px 0;
-      font-size: 11px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .keyword-panel .kw:hover { background: #d6e4f0; }
-
-    .memory-index {
-      top: 90px;
-      right: 24px;
-      width: 260px;
-      max-height: 60vh;
-      overflow-y: auto;
-      display: none;
-    }
-
-    .memory-index.visible { display: block; }
-
-    .memory-index .item {
-      padding: 6px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      color: #4a5a6a;
-      font-size: 11.5px;
-      transition: background 0.15s;
-      display: flex;
-      gap: 8px;
-    }
-
-    .memory-index .item:hover {
-      background: #eef3f8;
-      color: #1a3a5c;
-    }
-
-    .memory-index .item .id {
-      font-family: monospace;
-      color: #98a5b3;
-      flex-shrink: 0;
-    }
-
-    .memory-index .item.current {
-      background: #d6e4f0;
-      color: #1a3a5c;
-      font-weight: 500;
-    }
-
-    .index-toggle {
-      position: fixed;
-      top: 90px;
-      right: 24px;
-      background: #1a3a5c;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      cursor: pointer;
-      font-size: 18px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-      z-index: 15;
-      transition: background 0.2s;
-    }
-
-    .index-toggle:hover { background: #2a5a8c; }
-
-    .hint-bar {
-      text-align: center;
-      margin-top: 18px;
-      font-size: 12px;
-      color: #98a5b3;
-      letter-spacing: 1px;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-4px); }
-      40% { transform: translateX(4px); }
-      60% { transform: translateX(-3px); }
-      80% { transform: translateX(3px); }
-    }
-
+    .error-title { color: #c0392b !important; border-bottom-color: #f5d6d1 !important; }
+    .error-code { font-family: monospace; font-size: 12px; color: #ccc; margin-top: 20px; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
     .shake { animation: shake 0.35s ease; }
 
-    @media (max-width: 700px) {
-      .header { padding: 14px 20px; font-size: 16px; letter-spacing: 2px; }
-      .container { margin: 20px auto 160px; padding: 0 12px; }
-      .content { padding: 24px 22px; font-size: 15px; }
-      .search-box button { padding: 14px 18px; letter-spacing: 0; }
-      .memory-bar { bottom: 12px; right: 12px; font-size: 11px; }
-      .keyword-panel { bottom: 60px; left: 12px; max-width: 180px; }
-      .memory-index { top: 76px; right: 12px; width: 220px; }
-      .index-toggle { top: 76px; right: 12px; width: 36px; height: 36px; font-size: 15px; }
+    .memory-bar {
+      position: fixed; bottom: 20px; right: 24px; background: rgba(26, 58, 92, 0.92);
+      color: #d0dbe6; padding: 10px 16px; border-radius: 20px;
+      font-size: 12px; font-family: monospace; z-index: 20;
     }
+    .memory-bar span { color: #6ec6ff; font-weight: bold; }
+    
+    .panel { position: fixed; background: rgba(255,255,255,0.98); border: 1px solid #d0d7de; border-radius: 10px; padding: 16px; font-size: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 10; }
+    .panel h4 { margin: 0 0 10px 0; font-size: 13px; color: #1a3a5c; border-bottom: 1px solid #e8eef5; padding-bottom: 8px; }
+    .memory-index { top: 90px; right: 24px; width: 280px; max-height: 60vh; overflow-y: auto; display: none; }
+    .memory-index.visible { display: block; }
+    .memory-index .item { padding: 8px 10px; border-radius: 4px; cursor: pointer; color: #4a5a6a; font-size: 12px; display: flex; gap: 10px; transition: background 0.15s; }
+    .memory-index .item:hover { background: #eef3f8; color: #1a3a5c; }
+    .memory-index .item .id { font-family: monospace; color: #98a5b3; flex-shrink: 0; }
+    .memory-index .item.current { background: #d6e4f0; color: #1a3a5c; font-weight: 500; }
+    .memory-index .item.special .id { color: #c0392b; font-weight: bold; }
+    .index-toggle {
+      position: fixed; top: 90px; right: 24px; background: #007bff; color: white; border: none;
+      border-radius: 50%; width: 46px; height: 46px; cursor: pointer; font-size: 20px;
+      z-index: 15; box-shadow: 0 4px 12px rgba(0,123,255,0.3); transition: background 0.2s;
+    }
+    .index-toggle:hover { background: #0056b3; }
+    .hint-bar { text-align: center; margin-top: 18px; font-size: 13px; color: #98a5b3; }
+
+    @media (max-width: 1100px) {
+      .header .nav-links { gap: 12px; font-size: 13px; }
+      .top-search-box { max-width: 220px; }
+    }
+    @media (max-width: 900px) {
+      .header { padding: 12px 20px; gap: 10px; }
+      .header .nav-links { order: 3; width: 100%; justify-content: space-between; font-size: 12px; gap: 8px; }
+      .header .logo span { font-size: 16px; }
+      .header .logo img.site-logo { height: 36px; }
+      .top-search-box { max-width: 100%; width: 100%; order: 4; margin-top: 5px; }
+      .hero-section { height: 500px; padding: 0 30px; }
+      .hero-title { font-size: 30px; }
+      .hero-subtitle { font-size: 16px; }
+      .hero-stats { font-size: 14px; }
+      .game-area { padding: 20px 15px 140px; }
+      .memory-index { top: 100px; right: 12px; width: 240px; }
+      .index-toggle { top: 100px; right: 12px; width: 40px; height: 40px; font-size: 18px; }
+      .news-list-item { flex-wrap: wrap; padding: 18px 20px; gap: 10px; }
+      .news-date { width: auto; font-size: 13px; }
+      .news-divider { margin: 0 10px; }
+      .news-title { width: 100%; order: 2; font-size: 15px; margin-top: 5px; }
+      .news-btn { order: 3; margin-left: auto; padding: 6px 16px; font-size: 13px; }
+    }
+
+    .staff-login-input {
+      width: 100%; background: transparent; border: none; outline: none;
+      color: white; font-size: 15px; font-family: monospace;
+      padding: 0; letter-spacing: 0.5px;
+    }
+    .staff-login-input::placeholder { color: rgba(255,255,255,0.35); font-family: inherit; letter-spacing: 0; }
+    .staff-login-field {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 14px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .staff-login-field:focus-within {
+      border-color: rgba(110, 198, 255, 0.6);
+      background: rgba(255,255,255,0.12);
+    }
+    .login-eye {
+      margin-left: auto; color: rgba(255,255,255,0.4);
+      font-size: 15px; cursor: pointer; user-select: none;
+    }
+    .login-eye:hover { color: rgba(255,255,255,0.8); }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div class="logo">思辰医疗 · 让每个灵魂完整</div>
-    <div class="node-id" id="nodeIdDisplay">MEM://N001</div>
+    <div class="logo">
+      <img src="assets/retouch_2026093018120079.png" alt="思辰医疗院标" class="site-logo">
+      <span>思辰医疗</span>
+    </div>
+    <div class="nav-links">
+      <a onclick="jumpTo('N002'); return false;">伦理合规</a>
+      <a onclick="jumpTo('N003'); return false;">治疗方案</a>
+      <a onclick="jumpTo('N004'); return false;">治愈案例</a>
+      <a onclick="jumpTo('N_ABOUT'); return false;">了解我们</a>
+      <a onclick="showFakeAlert('联系我们', '咨询护士：周慧兰；\n客服热线：400-XXX-XXXX\n地址：思辰医疗总部大楼'); return false;">联系我们</a>
+    </div>
+    <div class="right-actions">
+      <div class="top-search-box">
+        <input type="text" id="searchInput" placeholder="搜索任何关键词..." autocomplete="off">
+        <button onclick="doSearch()">搜索</button>
+      </div>
+    </div>
   </div>
 
   <button class="index-toggle" id="indexToggle" onclick="toggleIndex()" title="记忆索引">☰</button>
 
-  <div class="container">
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜索任何关键词..." autocomplete="off">
-      <button onclick="doSearch()">搜索</button>
-    </div>
-
+  <div class="game-area" id="gameArea">
     <div class="content" id="content"></div>
-
-    <div class="hint-bar" id="hintBar">
-      提示：搜索框全局通用。输入任何你想到的关键词。
-    </div>
+    <div class="hint-bar" id="hintBar">提示：搜索框全局通用。输入任何你想到的关键词。</div>
   </div>
 
-  <div class="memory-bar">
-    记忆完整度：<span id="memoryPercent">0%</span>
-  </div>
-
-  <div class="panel keyword-panel" id="keywordPanel">
-    <h4>已发现关键词</h4>
-    <div id="keywordList"></div>
-  </div>
+  <div class="memory-bar">记忆完整度：<span id="memoryPercent">0%</span></div>
 
   <div class="panel memory-index" id="memoryIndex">
     <h4>记忆索引</h4>
@@ -386,140 +257,223 @@
     // ============================================================
     let currentNodeId = "N001";
     let unlockedNodes = JSON.parse(localStorage.getItem('unlockedNodes') || '["N001"]');
-    let discoveredKeywords = JSON.parse(localStorage.getItem('discoveredKeywords') || '[]');
+    let heroInterval = null; 
 
-    // 真实节点数量（不含 N_LOCKED）
-    const realNodeIds = Object.keys(nodes).filter(function (id) {
-      return id !== "N_LOCKED";
-    });
+    // 排除 N_LOCKED 和 N_ABOUT 作为计数节点，N_ZHOU 与 N_ZHOU_LOGGED 现在纳入统计
+    const realNodeIds = Object.keys(nodes).filter(id => id !== "N_LOCKED" && id !== "N_ABOUT");
     const totalNodes = realNodeIds.length;
 
     // ============================================================
-    // 节点渲染
+    // 排序辅助：普通节点（N001~N069）在前，特殊节点（N_ZHOU, N_ZHOU_LOGGED）在后
+    // ============================================================
+    function getSortKey(id) {
+      const num = parseInt(id.replace('N', ''), 10);
+      if (!isNaN(num)) return { group: 0, num: num };
+      if (id === 'N_ZHOU') return { group: 1, num: 0 };
+      if (id === 'N_ZHOU_LOGGED') return { group: 1, num: 1 };
+      return { group: 2, num: 0 };
+    }
+
+    function sortNodes(a, b) {
+      const ka = getSortKey(a);
+      const kb = getSortKey(b);
+      if (ka.group !== kb.group) return ka.group - kb.group;
+      return ka.num - kb.num;
+    }
+
+    // ============================================================
+    // 背景图轮播控制
+    // ============================================================
+    function stopHeroSlideshow() {
+      if (heroInterval) {
+        clearInterval(heroInterval);
+        heroInterval = null;
+      }
+    }
+
+    function startHeroSlideshow() {
+      stopHeroSlideshow(); 
+      const bg1 = document.querySelector('.hero-bg-1');
+      const bg2 = document.querySelector('.hero-bg-2');
+      if (!bg1 || !bg2) return;
+
+      let isFirstActive = true;
+      heroInterval = setInterval(() => {
+        if (isFirstActive) {
+          bg1.classList.remove('active');
+          bg2.classList.add('active');
+        } else {
+          bg2.classList.remove('active');
+          bg1.classList.add('active');
+        }
+        isFirstActive = !isFirstActive;
+      }, 5000);
+    }
+
+    // ============================================================
+    // 渲染与路由
     // ============================================================
     function renderNode(nodeId, skipLoading) {
       const node = nodes[nodeId];
       if (!node) return;
 
+      stopHeroSlideshow();
+
       currentNodeId = nodeId;
       unlockNode(nodeId);
 
-      document.getElementById('nodeIdDisplay').textContent = 'MEM://' + nodeId;
-
-      if (!skipLoading) {
-        document.getElementById('content').innerHTML = `
-          <div class="loading">
-            <div class="spinner"></div>
-            <div>正在从记忆空间读取数据<span class="dots"></span></div>
-          </div>
-        `;
+      if (nodeId === 'N001') {
+        document.body.classList.remove('page-bg-blue');
+      } else {
+        document.body.classList.add('page-bg-blue');
       }
 
-      const delay = skipLoading ? 0 : 500;
+      if (nodeId === 'N_ZHOU') {
+        document.body.classList.add('node-fullscreen');
+      } else {
+        document.body.classList.remove('node-fullscreen');
+      }
 
-      setTimeout(function () {
-        document.getElementById('content').innerHTML = node.content;
-        document.getElementById('content').classList.remove('shake');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        updateMemoryIndex();
-      }, delay);
+      const newHash = '#' + nodeId;
+      if (window.location.hash !== newHash) {
+        history.pushState(null, null, newHash);
+      }
+
+      const contentEl = document.getElementById('content');
+      if (contentEl) {
+        if (!skipLoading) {
+          contentEl.innerHTML = `<div class="loading"><div class="spinner"></div><div>正在从记忆空间读取数据<span class="dots"></span></div></div>`;
+          setTimeout(() => {
+            renderContent(nodeId, node, contentEl);
+          }, 400);
+        } else {
+          renderContent(nodeId, node, contentEl);
+        }
+      }
 
       updateMemory();
-      updateKeywordPanel();
+      updateMemoryIndex();
+    }
+
+    function renderContent(nodeId, node, contentEl) {
+      if (nodeId === 'N001') {
+        contentEl.innerHTML = `
+          <div class="hero-section">
+            <div class="hero-bg hero-bg-1 active" style="background-image: url('assets/064f301976a1b4962691040f4f664ead.jpg');"></div>
+            <div class="hero-bg hero-bg-2" style="background-image: url('assets/d47b7f35247a679e9b5d42b7b3edac26.png');"></div>
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+              <h1 class="hero-title">思辰脑机——让每一个灵魂完整</h1>
+              <p class="hero-subtitle">我们的人格统合治疗技术，已帮助超过3000名患者重获完整人生。</p>
+              <p class="hero-stats">治愈率超过90%，患者满意度行业领先</p>
+            </div>
+          </div>
+        `;
+        setTimeout(startHeroSlideshow, 100);
+      } else {
+        contentEl.innerHTML = node.content;
+      }
+      contentEl.classList.remove('shake');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      updateMemoryIndex();
     }
 
     // ============================================================
-    // 全局搜索逻辑
+    // 导航与辅助函数
+    // ============================================================
+    function jumpTo(nodeId) {
+      if (nodes[nodeId]) {
+        renderNode(nodeId);
+      } else {
+        console.warn("尝试跳转到不存在的节点:", nodeId);
+      }
+    }
+
+    function showFakeAlert(title, message) {
+      alert(`【${title}】\n\n${message}`);
+    }
+
+    function doStaffLogin() {
+      const userEl = document.getElementById('login-user');
+      const passEl = document.getElementById('login-pass');
+      if (!userEl || !passEl) return;
+      
+      const user = userEl.value.trim();
+      const pass = passEl.value;
+
+      if (user === 'SC-NUR-2020-0418' && pass === '202306') {
+        renderNode('N_ZHOU_LOGGED');
+      } else {
+        alert('工号或密码错误。\n\n提示：密码与周慧兰的离职时间有关。');
+      }
+    }
+
+    function togglePassword() {
+      const passEl = document.getElementById('login-pass');
+      const eyeEl = document.getElementById('login-eye');
+      if (!passEl || !eyeEl) return;
+      if (passEl.type === 'password') {
+        passEl.type = 'text';
+        eyeEl.textContent = '🙈';
+      } else {
+        passEl.type = 'password';
+        eyeEl.textContent = '👁';
+      }
+    }
+
+    window.addEventListener('popstate', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && nodes[hash]) {
+        renderNode(hash, true);
+      }
+    });
+
+    // ============================================================
+    // 搜索逻辑
     // ============================================================
     function doSearch() {
       const inputEl = document.getElementById('searchInput');
+      if (!inputEl) return;
       const input = inputEl.value.trim();
+      if (!input) return;
 
-      if (!input) {
-        showError('请输入搜索内容。');
-        return;
-      }
-
-      // 记录关键词
-      if (!discoveredKeywords.includes(input)) {
-        discoveredKeywords.push(input);
-        localStorage.setItem('discoveredKeywords', JSON.stringify(discoveredKeywords));
-      }
-
-      // ---- 1. 结局关键词：只在 N057 生效 ----
-      if (endingKeywords[input]) {
+      if (typeof endingKeywords !== 'undefined' && endingKeywords[input]) {
         if (currentNodeId !== "N057") {
-          showError('这个词现在还没有意义。');
-          return;
+          showError('这个词现在还没有意义。'); return;
         }
-
         const targetId = endingKeywords[input];
-
-        // 隐藏结局需要 N065 和 N056
         if (targetId === "N069") {
-          const required = prerequisites["N069"] || ["N065", "N056"];
-          const allUnlocked = required.every(function (id) {
-            return unlockedNodes.includes(id);
-          });
-          if (!allUnlocked) {
-            inputEl.value = '';
-            renderNode("N_LOCKED");
-            return;
+          const required = (typeof prerequisites !== 'undefined' && prerequisites["N069"]) || [];
+          if (!required.every(id => unlockedNodes.includes(id))) {
+            inputEl.value = ''; renderNode("N_LOCKED"); return;
           }
         }
-
-        inputEl.value = '';
-        renderNode(targetId);
-        return;
+        inputEl.value = ''; renderNode(targetId); return;
       }
 
-      // ---- 2. 全局关键词 ----
-      const targetId = globalKeywords[input];
+      const targetId = (typeof globalKeywords !== 'undefined' && globalKeywords[input]);
+      if (!targetId) { showError('记忆读取失败。请重试。'); return; }
 
-      if (!targetId) {
-        showError('记忆读取失败。请重试。');
-        return;
-      }
-
-      // ---- 3. 前置条件检查 ----
-      if (prerequisites[targetId] && !unlockedNodes.includes(targetId)) {
-        const required = prerequisites[targetId];
-        const allUnlocked = required.every(function (id) {
-          return unlockedNodes.includes(id);
-        });
-
-        if (!allUnlocked) {
-          inputEl.value = '';
-          renderNode("N_LOCKED");
-          return;
+      if (typeof prerequisites !== 'undefined' && prerequisites[targetId] && !unlockedNodes.includes(targetId)) {
+        if (!prerequisites[targetId].every(id => unlockedNodes.includes(id))) {
+          inputEl.value = ''; renderNode("N_LOCKED"); return;
         }
       }
 
-      // ---- 4. 跳转 ----
-      inputEl.value = '';
-      renderNode(targetId);
+      inputEl.value = ''; renderNode(targetId);
     }
 
     // ============================================================
-    // 错误显示
+    // 辅助功能
     // ============================================================
     function showError(message) {
       const content = document.getElementById('content');
-      content.innerHTML = `
-        <h2 class="error-title">记忆读取失败</h2>
-        <p>${message}</p>
-        <p style="font-size:12px;color:#999;">请尝试其他关键词。</p>
-        <p class="error-code">ERROR CODE: MEM_404</p>
-      `;
+      if (!content) return;
+      content.innerHTML = `<h2 class="error-title">记忆读取失败</h2><p>${message}</p><p style="font-size:12px;color:#999;">请尝试其他关键词。</p><p class="error-code">ERROR CODE: MEM_404</p>`;
       content.classList.add('shake');
-      setTimeout(function () {
-        content.classList.remove('shake');
-      }, 400);
+      setTimeout(() => content.classList.remove('shake'), 400);
     }
 
-    // ============================================================
-    // 解锁节点
-    // ============================================================
     function unlockNode(nodeId) {
       if (!unlockedNodes.includes(nodeId)) {
         unlockedNodes.push(nodeId);
@@ -527,150 +481,73 @@
       }
     }
 
-    // ============================================================
-    // 更新记忆完整度
-    // ============================================================
+    // 只排除 N_LOCKED 和 N_ABOUT；N_ZHOU 和 N_ZHOU_LOGGED 现在被计入
     function updateMemory() {
-      const unlockedReal = unlockedNodes.filter(function (id) {
-        return id !== "N_LOCKED";
-      });
+      const unlockedReal = unlockedNodes.filter(id => 
+        id !== "N_LOCKED" && id !== "N_ABOUT"
+      );
       const percent = Math.round(unlockedReal.length / totalNodes * 100);
-      document.getElementById('memoryPercent').textContent = percent + '%';
+      const el = document.getElementById('memoryPercent');
+      if (el) el.textContent = percent + '%';
     }
 
-    // ============================================================
-    // 更新已发现关键词面板
-    // ============================================================
-    function updateKeywordPanel() {
-      const panel = document.getElementById('keywordPanel');
-      const list = document.getElementById('keywordList');
-
-      if (discoveredKeywords.length === 0) {
-        panel.classList.remove('visible');
-        return;
-      }
-
-      panel.classList.add('visible');
-      list.innerHTML = '';
-
-      discoveredKeywords.forEach(function (kw) {
-        const tag = document.createElement('span');
-        tag.className = 'kw';
-        tag.textContent = kw;
-        tag.onclick = function () {
-          document.getElementById('searchInput').value = kw;
-          document.getElementById('searchInput').focus();
-        };
-        list.appendChild(tag);
-      });
-    }
-
-    // ============================================================
-    // 更新记忆索引面板
-    // ============================================================
+    // 只排除 N_LOCKED 和 N_ABOUT；N_ZHOU 和 N_ZHOU_LOGGED 现在被收录进记忆索引
     function updateMemoryIndex() {
       const list = document.getElementById('memoryList');
       if (!list) return;
-
       list.innerHTML = '';
-
-      // 按节点编号排序
       const sorted = unlockedNodes
-        .filter(function (id) { return id !== "N_LOCKED"; })
-        .sort(function (a, b) {
-          const na = parseInt(a.replace('N', ''), 10);
-          const nb = parseInt(b.replace('N', ''), 10);
-          return na - nb;
-        });
-
-      sorted.forEach(function (nodeId) {
-        const node = nodes[nodeId];
-        if (!node) return;
-
+        .filter(id => id !== "N_LOCKED" && id !== "N_ABOUT")
+        .sort(sortNodes);
+      sorted.forEach(nodeId => {
+        const node = nodes[nodeId]; if (!node) return;
         const item = document.createElement('div');
-        item.className = 'item' + (nodeId === currentNodeId ? ' current' : '');
-
-        const idSpan = document.createElement('span');
-        idSpan.className = 'id';
-        idSpan.textContent = nodeId;
-
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = node.title;
-
-        item.appendChild(idSpan);
-        item.appendChild(titleSpan);
-
-        item.onclick = function () {
-          renderNode(nodeId);
-          document.getElementById('memoryIndex').classList.remove('visible');
-          document.getElementById('indexToggle').style.display = 'block';
+        const isSpecial = (nodeId === 'N_ZHOU' || nodeId === 'N_ZHOU_LOGGED');
+        item.className = 'item' + (nodeId === currentNodeId ? ' current' : '') + (isSpecial ? ' special' : '');
+        item.innerHTML = `<span class="id">${nodeId}</span><span>${node.title}</span>`;
+        item.onclick = () => { 
+          renderNode(nodeId); 
+          document.getElementById('memoryIndex').classList.remove('visible'); 
+          document.getElementById('indexToggle').style.display = 'block'; 
         };
-
         list.appendChild(item);
       });
-
-      if (sorted.length === 0) {
-        list.innerHTML = '<div style="color:#98a5b3;font-size:11px;">暂无已解锁节点</div>';
-      }
     }
 
-    // ============================================================
-    // 记忆索引开关
-    // ============================================================
     function toggleIndex() {
       const panel = document.getElementById('memoryIndex');
       const toggle = document.getElementById('indexToggle');
-      const isVisible = panel.classList.contains('visible');
-
-      if (isVisible) {
-        panel.classList.remove('visible');
-        toggle.style.display = 'block';
-      } else {
-        updateMemoryIndex();
-        panel.classList.add('visible');
-        toggle.style.display = 'none';
+      if (panel.classList.contains('visible')) { 
+        panel.classList.remove('visible'); 
+        toggle.style.display = 'block'; 
+      } else { 
+        updateMemoryIndex(); 
+        panel.classList.add('visible'); 
+        toggle.style.display = 'none'; 
       }
     }
 
-    // ============================================================
-    // 重置游戏
-    // ============================================================
     function resetGame() {
       if (!confirm('确定要重新开始吗？所有进度将被清除。')) return;
-      localStorage.removeItem('unlockedNodes');
-      localStorage.removeItem('discoveredKeywords');
+      localStorage.removeItem('unlockedNodes'); 
       location.reload();
     }
 
     // ============================================================
-    // 回车键支持
-    // ============================================================
-    document.getElementById('searchInput').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') doSearch();
-    });
-
-    // ============================================================
-    // 启动
+    // 初始化
     // ============================================================
     (function init() {
-      // 从最后解锁的非结局节点继续
-      const startNode = unlockedNodes.length > 0
-        ? unlockedNodes[unlockedNodes.length - 1]
-        : 'N001';
+      const hash = window.location.hash.replace('#', '');
+      const startNode = (hash && nodes[hash]) ? hash : (unlockedNodes.length > 0 ? unlockedNodes[unlockedNodes.length - 1] : 'N001');
+      renderNode(startNode, true);
+      updateMemory(); updateMemoryIndex();
 
-      const nodeData = nodes[startNode];
-      const isEnding = startNode && startNode.startsWith('N06') && nodeData &&
-        (!nodeData.keywords || Object.keys(nodeData.keywords).length === 0);
-
-      if (!nodeData || isEnding || startNode === 'N_LOCKED') {
-        renderNode('N001', true);
-      } else {
-        renderNode(startNode, true);
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('keydown', e => { 
+          if (e.key === 'Enter') doSearch(); 
+        });
       }
-
-      updateMemory();
-      updateKeywordPanel();
-      updateMemoryIndex();
     })();
   </script>
 </body>
